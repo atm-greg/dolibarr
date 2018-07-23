@@ -409,7 +409,7 @@ if (empty($reshook))
 					$localtax2_tx,
 					$idprod,
 					$productsupplier->product_fourn_price_id,
-					$productsupplier->fourn_ref,
+					$productsupplier->ref_supplier,
 					$remise_percent,
 					'HT',
 					$pu_ttc,
@@ -837,6 +837,8 @@ if (empty($reshook))
 				$object->generateDocument($object->modelpdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}
 			$action = '';
+			header("Location: ".$_SERVER["PHP_SELF"]."?id=".$object->id);
+			exit;
 		}
 		else
 		{
@@ -967,6 +969,7 @@ if (empty($reshook))
 
 					if ($result < 0)
 					{
+						setEventMessages($object->error,$object->errors,'errors');
 						$error++;
 					}
 
@@ -1070,8 +1073,6 @@ if (empty($reshook))
 							$fk_parent_line = 0;
 							$num = count($lines);
 
-							$productsupplier = new ProductFournisseur($db);
-
 							for($i = 0; $i < $num; $i ++)
 							{
 
@@ -1079,7 +1080,7 @@ if (empty($reshook))
 									continue;
 
 								$label = (! empty($lines[$i]->label) ? $lines[$i]->label : '');
-								$desc = (! empty($lines[$i]->desc) ? $lines[$i]->desc : $lines[$i]->libelle);
+								$desc = (! empty($lines[$i]->desc) ? $lines[$i]->desc : $lines[$i]->product_desc);
 								$product_type = (! empty($lines[$i]->product_type) ? $lines[$i]->product_type : 0);
 
 								// Reset fk_parent_line for no child products and special product
@@ -1095,43 +1096,57 @@ if (empty($reshook))
 									$array_option = $lines[$i]->array_options;
 								}
 
-								$result = $productsupplier->find_min_price_product_fournisseur($lines[$i]->fk_product, $lines[$i]->qty, $srcobject->socid);
-								if ($result>=0)
+								$ref_supplier = '';
+								$product_fourn_price_id = 0;
+								if ($origin == "commande")
 								{
-									$tva_tx = $lines[$i]->tva_tx;
-
-									if ($origin=="commande")
+									$productsupplier = new ProductFournisseur($db);
+									$result = $productsupplier->find_min_price_product_fournisseur($lines[$i]->fk_product, $lines[$i]->qty, $srcobject->socid);
+									if ($result > 0)
 									{
-										$soc=new societe($db);
-										$soc->fetch($socid);
-										$tva_tx=get_default_tva($soc, $mysoc, $lines[$i]->fk_product, $productsupplier->product_fourn_price_id);
+										$ref_supplier = $productsupplier->ref_supplier;
+										$product_fourn_price_id = $productsupplier->product_fourn_price_id;
 									}
-
-									$result = $object->addline(
-										$desc,
-										$lines[$i]->subprice,
-										$lines[$i]->qty,
-										$tva_tx,
-										$lines[$i]->localtax1_tx,
-										$lines[$i]->localtax2_tx,
-										$lines[$i]->fk_product > 0 ? $lines[$i]->fk_product : 0,
-										$productsupplier->product_fourn_price_id,
-										$productsupplier->ref_supplier,
-										$lines[$i]->remise_percent,
-										'HT',
-										0,
-										$lines[$i]->product_type,
-										'',
-										'',
-										null,
-										null,
-										array(),
-										$lines[$i]->fk_unit,
-										0,
-										$element,
-										!empty($lines[$i]->id) ? $lines[$i]->id : $lines[$i]->rowid
-									);
 								}
+								else
+								{
+									$ref_supplier = $lines[$i]->ref_fourn;
+									$product_fourn_price_id = 0;
+								}
+
+								$tva_tx = $lines[$i]->tva_tx;
+
+								if ($origin=="commande")
+								{
+									$soc=new societe($db);
+									$soc->fetch($socid);
+									$tva_tx=get_default_tva($soc, $mysoc, $lines[$i]->fk_product, $product_fourn_price_id);
+								}
+
+								$result = $object->addline(
+									$desc,
+									$lines[$i]->subprice,
+									$lines[$i]->qty,
+									$tva_tx,
+									$lines[$i]->localtax1_tx,
+									$lines[$i]->localtax2_tx,
+									$lines[$i]->fk_product > 0 ? $lines[$i]->fk_product : 0,
+									$product_fourn_price_id,
+									$ref_supplier,
+									$lines[$i]->remise_percent,
+									'HT',
+									0,
+									$lines[$i]->product_type,
+									'',
+									'',
+									null,
+									null,
+									array(),
+									$lines[$i]->fk_unit,
+									0,
+									$element,
+									!empty($lines[$i]->id) ? $lines[$i]->id : $lines[$i]->rowid
+								);
 
 								if ($result < 0) {
 									$error++;
@@ -1355,6 +1370,8 @@ if ($action=='create')
 	print load_fiche_titre($langs->trans('NewOrder'));
 
 	dol_htmloutput_events();
+
+	$currency_code = $conf->currency;
 
 	$societe='';
 	if ($socid>0)
@@ -1723,11 +1740,13 @@ elseif (! empty($object->id))
 			$langs->load("stocks");
 			require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 			$formproduct=new FormProduct($db);
+			$forcecombo=0;
+			if ($conf->browser->name == 'ie') $forcecombo = 1;	// There is a bug in IE10 that make combo inside popup crazy
 			$formquestion=array(
-					//'text' => $langs->trans("ConfirmClone"),
-					//array('type' => 'checkbox', 'name' => 'clone_content',   'label' => $langs->trans("CloneMainAttributes"),   'value' => 1),
-					//array('type' => 'checkbox', 'name' => 'update_prices',   'label' => $langs->trans("PuttingPricesUpToDate"),   'value' => 1),
-					array('type' => 'other', 'name' => 'idwarehouse',   'label' => $langs->trans("SelectWarehouseForStockIncrease"),   'value' => $formproduct->selectWarehouses(GETPOST('idwarehouse'),'idwarehouse','',1))
+				//'text' => $langs->trans("ConfirmClone"),
+				//array('type' => 'checkbox', 'name' => 'clone_content',   'label' => $langs->trans("CloneMainAttributes"),   'value' => 1),
+				//array('type' => 'checkbox', 'name' => 'update_prices',   'label' => $langs->trans("PuttingPricesUpToDate"),   'value' => 1),
+				array('type' => 'other', 'name' => 'idwarehouse',   'label' => $langs->trans("SelectWarehouseForStockIncrease"),   'value' => $formproduct->selectWarehouses(GETPOST('idwarehouse','int'), 'idwarehouse', '', 1, 0, 0, '', 0, $forcecombo))
 			);
 		}
 		$text=$langs->trans("ConfirmApproveThisOrder",$object->ref);
@@ -2172,6 +2191,7 @@ elseif (! empty($object->id))
 			// modified by hook
 			if (empty($reshook))
 			{
+				$object->fetchObjectLinked();		// Links are used to show or not button, so we load them now.
 
 				// Validate
 				if ($object->statut == 0 && $num > 0)
@@ -2300,11 +2320,11 @@ elseif (! empty($object->id))
 				// Ship
 				if (! empty($conf->stock->enabled) && ! empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_DISPATCH_ORDER))
 				{
-					if (in_array($object->statut, array(3,4))) {
+					if (in_array($object->statut, array(3,4,5))) {
 						if ($conf->fournisseur->enabled && $user->rights->fournisseur->commande->receptionner) {
-							print '<div class="inline-block divButAction"><a class="butAction" href="' . DOL_URL_ROOT . '/fourn/commande/dispatch.php?id=' . $object->id . '">' . $langs->trans('OrderDispatch') . '</a></div>';
+							print '<div class="inline-block divButAction"><a class="butAction" href="' . DOL_URL_ROOT . '/fourn/commande/dispatch.php?id=' . $object->id . '">' . $langs->trans('ReceiveProducts') . '</a></div>';
 						} else {
-							print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="' . dol_escape_htmltag($langs->trans("NotAllowed")) . '">' . $langs->trans('OrderDispatch') . '</a></div>';
+							print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="' . dol_escape_htmltag($langs->trans("NotAllowed")) . '">' . $langs->trans('ReceiveProducts') . '</a></div>';
 						}
 					}
 				}

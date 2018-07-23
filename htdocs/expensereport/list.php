@@ -72,7 +72,7 @@ $search_user  = GETPOST('search_user','int');
 $search_amount_ht = GETPOST('search_amount_ht','alpha');
 $search_amount_vat = GETPOST('search_amount_vat','alpha');
 $search_amount_ttc = GETPOST('search_amount_ttc','alpha');
-$search_status = (GETPOST('search_status','alpha')!=''?GETPOST('search_status','alpha'):GETPOST('statut','alpha'));
+$search_status = (GETPOST('search_status','intcomma')!=''?GETPOST('search_status','intcomma'):GETPOST('statut','intcomma'));
 $month_start  = GETPOST("month_start","int");
 $year_start   = GETPOST("year_start","int");
 $month_end    = GETPOST("month_end","int");
@@ -305,17 +305,12 @@ if ($search_amount_ttc != '') $sql.= natural_search('d.total_ttc', $search_amoun
 // User
 if ($search_user != '' && $search_user >= 0) $sql.= " AND u.rowid = '".$db->escape($search_user)."'";
 // Status
-if ($search_status != '' && $search_status >= 0)
-{
-	if (strstr($search_status, ',')) $sql.=" AND d.fk_statut IN (".$db->escape($search_status).")";
-	else $sql.=" AND d.fk_statut = ".$search_status;
-}
+if ($search_status != '' && $search_status >= 0) $sql.=" AND d.fk_statut IN (".$db->escape($search_status).")";
 // RESTRICT RIGHTS
 if (empty($user->rights->expensereport->readall) && empty($user->rights->expensereport->lire_tous)
     && (empty($conf->global->MAIN_USE_ADVANCED_PERMS) || empty($user->rights->expensereport->writeall_advance)))
 {
-	$childids = $user->getAllChildIds();
-	$childids[]=$user->id;
+	$childids = $user->getAllChildIds(1);
 	$sql.= " AND d.fk_user_author IN (".join(',',$childids).")\n";
 }
 // Add where from extra fields
@@ -446,12 +441,15 @@ if ($resql)
 				print '<a href="'.$_SERVER["PHP_SELF"].'?action=edit&id='.$user_id.'" class="butAction">'.$langs->trans("Modify").'</a>';
 			}
 
-			$canedit=(($user->id == $user_id && $user->rights->expensereport->creer) || ($user->id != $user_id));
+			$childids = $user->getAllChildIds(1);
+
+			$canedit=((in_array($user_id, $childids) && $user->rights->expensereport->creer)
+				|| ($conf->global->MAIN_USE_ADVANCED_PERMS && $user->rights->expensereport->writeall_advance));
 
 			// Boutons d'actions
 			if ($canedit)
 			{
-				print '<a href="'.DOL_URL_ROOT.'/expensereport/card.php?action=request&id='.$user_id.'" class="butAction">'.$langs->trans("AddTrip").'</a>';
+				print '<a href="'.DOL_URL_ROOT.'/expensereport/card.php?action=create&fk_user_author='.$fuser->id.'" class="butAction">'.$langs->trans("AddTrip").'</a>';
 			}
 
 			print '</div>';
