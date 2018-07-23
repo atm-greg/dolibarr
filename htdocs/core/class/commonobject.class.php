@@ -1358,19 +1358,24 @@ abstract class CommonObject
 		if (empty($format))   $format='text';
 		if (empty($id_field)) $id_field='rowid';
 
+		$fk_user_field = 'fk_user_modif';
+
 		$error=0;
 
 		$this->db->begin();
 
 		// Special case
 		if ($table == 'product' && $field == 'note_private') $field='note';
+		if (in_array($table, array('actioncomm', 'adherent', 'advtargetemailing', 'cronjob', 'establishment'))) {
+			$fk_user_field = 'fk_user_mod';
+		}
 
 		$sql = "UPDATE ".MAIN_DB_PREFIX.$table." SET ";
 		if ($format == 'text') $sql.= $field." = '".$this->db->escape($value)."'";
 		else if ($format == 'int') $sql.= $field." = ".$this->db->escape($value);
 		else if ($format == 'date') $sql.= $field." = ".($value ? "'".$this->db->idate($value)."'" : "null");
-		if (! empty($fuser) && is_object($fuser)) $sql.=", fk_user_modif = ".$fuser->id;
-		elseif (empty($fuser) || $fuser != 'none') $sql.=", fk_user_modif = ".$user->id;
+		if (! empty($fuser) && is_object($fuser)) $sql.=", ".$fk_user_field." = ".$fuser->id;
+		elseif (empty($fuser) || $fuser != 'none') $sql.=", ".$fk_user_field." = ".$user->id;
 		$sql.= " WHERE ".$id_field." = ".$id;
 
 		dol_syslog(get_class($this)."::".__FUNCTION__."", LOG_DEBUG);
@@ -2307,11 +2312,13 @@ abstract class CommonObject
 
 		if (! $this->table_element)
 		{
+			$this->error='update_note was called on objet with property table_element not defined';
 			dol_syslog(get_class($this)."::update_note was called on objet with property table_element not defined", LOG_ERR);
 			return -1;
 		}
 		if (! in_array($suffix,array('','_public','_private')))
 		{
+			$this->error='update_note Parameter suffix must be empty, \'_private\' or \'_public\'';
 			dol_syslog(get_class($this)."::update_note Parameter suffix must be empty, '_private' or '_public'", LOG_ERR);
 			return -2;
 		}
@@ -4602,6 +4609,10 @@ abstract class CommonObject
 						$new_array_options[$key] = $this->db->idate($this->array_options[$key]);
 						break;
 					case 'datetime':
+						// If data is a string instead of a timestamp, we convert it
+						if (! is_int($this->array_options[$key])) {
+							$this->array_options[$key] = strtotime($this->array_options[$key]);
+						}
 						$new_array_options[$key] = $this->db->idate($this->array_options[$key]);
 						break;
 		   			case 'link':
@@ -4787,6 +4798,7 @@ abstract class CommonObject
 			if (! $resql)
 			{
 				$this->error=$this->db->lasterror();
+				dol_syslog(get_class($this) . "::".__METHOD__ . $this->error, LOG_ERR);
 				$this->db->rollback();
 				return -1;
 			}
@@ -4835,7 +4847,8 @@ abstract class CommonObject
 			$type = 'varchar';		// convert varchar(xx) int varchar
 			$size = $reg[1];
 		}
-		elseif (preg_match('/varchar/', $type)) $type = 'varchar';		// convert varchar(xx) int varchar
+		elseif (preg_match('/varchar/', $type)) $type = 'varchar';		// convert varchar(xx) into varchar
+		elseif (preg_match('/double/', $type)) $type = 'double';		// convert double(xx) into double
 		if (is_array($val['arrayofkeyval'])) $type='select';
 		if (preg_match('/^integer:(.*):(.*)/i', $val['type'], $reg)) $type='link';
 
@@ -4910,7 +4923,6 @@ abstract class CommonObject
 			}
 		}
 		//var_dump($showsize.' '.$size);
-
 		if (in_array($type,array('date','datetime')))
 		{
 			$tmp=explode(',',$size);
@@ -5457,11 +5469,19 @@ abstract class CommonObject
 		elseif ($key == 'status' && method_exists($this, 'getLibStatut')) $value=$this->getLibStatut(3);
 		elseif ($type == 'date')
 		{
-			$value=dol_print_date($value,'day');
+			if(! empty($value)) {
+				$value=dol_print_date($value,'day');
+			} else {
+				$value='';
+			}
 		}
 		elseif ($type == 'datetime')
 		{
-			$value=dol_print_date($value,'dayhour');
+			if(! empty($value)) {
+				$value=dol_print_date($value,'dayhour');
+			} else {
+				$value='';
+			}
 		}
 		elseif ($type == 'double')
 		{
@@ -5763,9 +5783,9 @@ abstract class CommonObject
 						} else {
 							$value = $this->array_options["options_" . $key];			// No GET, no POST, no default value, so we take value of object.
 						}
+						//var_dump($keyprefix.' - '.$key.' - '.$keysuffix.' - '.$keyprefix.'options_'.$key.$keysuffix.' - '.$this->array_options["options_".$key.$keysuffix].' - '.$getposttemp.' - '.$value);
 						break;
 				}
-				//var_dump($value);
 
 				if ($extrafields->attribute_type[$key] == 'separate')
 				{
@@ -5790,12 +5810,17 @@ abstract class CommonObject
 					// Convert date into timestamp format (value in memory must be a timestamp)
 					if (in_array($extrafields->attribute_type[$key],array('date','datetime')))
 					{
-						$value = GETPOSTISSET($keyprefix.'options_'.$key.$keysuffix)?dol_mktime(GETPOST($keyprefix.'options_'.$key.$keysuffix."hour",'int',3), GETPOST($keyprefix.'options_'.$key.$keysuffix."min",'int',3), 0, GETPOST($keyprefix.'options_'.$key.$keysuffix."month",'int',3), GETPOST($keyprefix.'options_'.$key.$keysuffix."day",'int',3), GETPOST($keyprefix.'options_'.$key.$keysuffix."year",'int',3)):$this->db->jdate($this->array_options['options_'.$key]);
+						$datenotinstring = $this->array_options['options_' . $key];
+						if (! is_numeric($this->array_options['options_' . $key]))	// For backward compatibility
+						{
+							$datenotinstring = $this->db->jdate($datenotinstring);
+						}
+						$value = GETPOSTISSET($keyprefix.'options_'.$key.$keysuffix)?dol_mktime(GETPOST($keyprefix.'options_'.$key.$keysuffix."hour", 'int', 3), GETPOST($keyprefix.'options_'.$key.$keysuffix."min",'int',3), 0, GETPOST($keyprefix.'options_'.$key.$keysuffix."month",'int',3), GETPOST($keyprefix.'options_'.$key.$keysuffix."day",'int',3), GETPOST($keyprefix.'options_'.$key.$keysuffix."year",'int',3)):$datenotinstring;
 					}
 					// Convert float submited string into real php numeric (value in memory must be a php numeric)
 					if (in_array($extrafields->attribute_type[$key],array('price','double')))
 					{
-						$value = GETPOSTISSET($keyprefix.'options_'.$key.$keysuffix)?price2num(GETPOST($keyprefix.'options_'.$key.$keysuffix,'int',3)):$this->array_options['options_'.$key];
+						$value = GETPOSTISSET($keyprefix.'options_'.$key.$keysuffix)?price2num(GETPOST($keyprefix.'options_'.$key.$keysuffix, 'alpha', 3)):$this->array_options['options_'.$key];
 					}
 
 					$labeltoshow = $langs->trans($label);
@@ -5804,7 +5829,7 @@ abstract class CommonObject
 					{
 						$labeltoshow = '<span'.($mode != 'view' ? ' class="fieldrequired"':'').'>'.$labeltoshow.'</span>';
 					}
-					
+
 					if (empty($onetrtd)) $out .= '<td>';
 					else $out .= '<td'.($colspan?' colspan="'.($colspan+1).'"':'').'>';
 
@@ -6111,7 +6136,7 @@ abstract class CommonObject
 	 *
 	 * @return array
 	 */
-	protected function set_save_query()
+	protected function setSaveQuery()
 	{
 		global $conf;
 
@@ -6210,7 +6235,7 @@ abstract class CommonObject
 	 *
 	 * @return string
 	 */
-	protected function get_field_list()
+	protected function getFieldList()
 	{
 		$keys = array_keys($this->fields);
 		return implode(',', $keys);
@@ -6245,7 +6270,7 @@ abstract class CommonObject
 
 		$now=dol_now();
 
-		$fieldvalues = $this->set_save_query();
+		$fieldvalues = $this->setSaveQuery();
 		if (array_key_exists('date_creation', $fieldvalues) && empty($fieldvalues['date_creation'])) $fieldvalues['date_creation']=$this->db->idate($now);
 		if (array_key_exists('fk_user_creat', $fieldvalues) && ! ($fieldvalues['fk_user_creat'] > 0)) $fieldvalues['fk_user_creat']=$user->id;
 		unset($fieldvalues['rowid']);	// The field 'rowid' is reserved field name for autoincrement field so we don't need it into insert.
@@ -6266,7 +6291,7 @@ abstract class CommonObject
 			if (! empty($this->fields[$key]['foreignkey']) && $values[$key] == '-1') $values[$key]='';
 
 			//var_dump($key.'-'.$values[$key].'-'.($this->fields[$key]['notnull'] == 1));
-			if ($this->fields[$key]['notnull'] == 1 && ! isset($values[$key]))
+			if ($this->fields[$key]['notnull'] == 1 && ! isset($values[$key]) && is_null($val['default']))
 			{
 				$error++;
 				$this->errors[]=$langs->trans("ErrorFieldRequired", $this->fields[$key]['label']);
@@ -6337,7 +6362,7 @@ abstract class CommonObject
 	{
 		if (empty($id) && empty($ref)) return false;
 
-		$sql = 'SELECT '.$this->get_field_list();
+		$sql = 'SELECT '.$this->getFieldList();
 		$sql.= ' FROM '.MAIN_DB_PREFIX.$this->table_element;
 
 		if(!empty($id)) $sql.= ' WHERE rowid = '.$id;
@@ -6380,7 +6405,7 @@ abstract class CommonObject
 
 		$now=dol_now();
 
-		$fieldvalues = $this->set_save_query();
+		$fieldvalues = $this->setSaveQuery();
 		if (array_key_exists('date_modification', $fieldvalues) && empty($fieldvalues['date_modification'])) $fieldvalues['date_modification']=$this->db->idate($now);
 		if (array_key_exists('fk_user_modif', $fieldvalues) && ! ($fieldvalues['fk_user_modif'] > 0)) $fieldvalues['fk_user_modif']=$user->id;
 		unset($fieldvalues['rowid']);	// The field 'rowid' is reserved field name for autoincrement field so we don't need it into update.

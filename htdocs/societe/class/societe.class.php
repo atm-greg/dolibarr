@@ -942,7 +942,7 @@ class Societe extends CommonObject
 			$sql .= ",fk_effectif = ".(! empty($this->effectif_id)?"'".$this->db->escape($this->effectif_id)."'":"null");
 			if (isset($this->stcomm_id))
 			{
-				$sql .= ",fk_stcomm=".($this->stcomm_id > 0 ? $this->stcomm_id : "0");
+				$sql .= ",fk_stcomm=".(!empty($this->stcomm_id)  ? $this->stcomm_id : "0");
 			}
 			$sql .= ",fk_typent = ".(! empty($this->typent_id)?"'".$this->db->escape($this->typent_id)."'":"0");
 
@@ -2010,7 +2010,7 @@ class Societe extends CommonObject
 				$hookmanager=new HookManager($this->db);
 			}
 			$hookmanager->initHooks(array('societedao'));
-			$parameters=array('id'=>$this->id);
+			$parameters=array('id'=>$this->id, 'linkclose'=>$linkclose);
 			$reshook=$hookmanager->executeHooks('getnomurltooltip',$parameters,$this,$action);    // Note that $action and $object may have been modified by some hooks
 			if ($reshook > 0) $linkclose = $hookmanager->resPrint;
 		}
@@ -2582,21 +2582,16 @@ class Societe extends CommonObject
 
 		if (! empty($conf->global->SOCIETE_CODECOMPTA_ADDON))
 		{
-			$file='';
+			$res=false;
 			$dirsociete=array_merge(array('/core/modules/societe/'), $conf->modules_parts['societe']);
 			foreach ($dirsociete as $dirroot)
 			{
-				if (file_exists(DOL_DOCUMENT_ROOT.'/'.$dirroot.$conf->global->SOCIETE_CODECOMPTA_ADDON.".php"))
-				{
-					$file=$dirroot.$conf->global->SOCIETE_CODECOMPTA_ADDON.".php";
-					break;
-				}
+				$res=dol_include_once($dirroot.$conf->global->SOCIETE_CODECOMPTA_ADDON.'.php');
+				if ($res) break;
 			}
 
-			if (! empty($file))
+			if ($res)
 			{
-				dol_include_once($file);
-
 				$classname = $conf->global->SOCIETE_CODECOMPTA_ADDON;
 				$mod = new $classname;
 

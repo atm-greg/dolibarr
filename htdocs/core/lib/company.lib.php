@@ -398,7 +398,7 @@ function societe_admin_prepare_head()
  *    @param      Translate	$outputlangs	Langs object for output translation
  *    @param      int		$entconv       	0=Return value without entities and not converted to output charset, 1=Ready for html output
  *    @param      int		$searchlabel    Label of country to search (warning: searching on label is not reliable)
- *    @return     mixed       				String with country code or translated country name or Array('id','code','label')
+ *    @return     mixed       				Integer with country id or String with country code or translated country name or Array('id','code','label') or 'NotDefined'
  */
 function getCountry($searchkey, $withcode='', $dbtouse=0, $outputlangs='', $entconv=1, $searchlabel='')
 {
@@ -772,6 +772,7 @@ function show_contacts($conf,$langs,$db,$object,$backtopage='')
 
     $form = new Form($db);
 
+    $optioncss = GETPOST('optioncss', 'alpha');
     $sortfield = GETPOST("sortfield",'alpha');
     $sortorder = GETPOST("sortorder",'alpha');
     $page = GETPOST('page','int');
@@ -823,7 +824,7 @@ function show_contacts($conf,$langs,$db,$object,$backtopage='')
     {
     	if (GETPOST('search_'.$key,'alpha')) $search[$key]=GETPOST('search_'.$key,'alpha');
     }
-
+    $search_array_options=$extrafields->getOptionalsFromPost($extralabels,'','search_');
 
     // Purge search criteria
     if (GETPOST('button_removefilter_x','alpha') || GETPOST('button_removefilter.x','alpha') ||GETPOST('button_removefilter','alpha')) // All tests are required to be compatible with all browsers
@@ -870,9 +871,12 @@ function show_contacts($conf,$langs,$db,$object,$backtopage='')
 	print '<div class="div-table-responsive">';		// You can use div-table-responsive-no-min if you dont need reserved height for your table
     print "\n".'<table class="tagtable liste">'."\n";
 
-    $param="socid=".$object->id;
-    if ($search_status != '') $param.='&amp;search_status='.$search_status;
-    if ($search_name != '') $param.='&amp;search_name='.urlencode($search_name);
+    $param="socid=".urlencode($object->id);
+    if ($search_status != '') $param.='&search_status='.urlencode($search_status);
+    if ($search_name != '')   $param.='&search_name='.urlencode($search_name);
+    if ($optioncss != '')     $param.='&optioncss='.urlencode($optioncss);
+    // Add $param from extra fields
+    include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
 
     $sql = "SELECT t.rowid, t.lastname, t.firstname, t.fk_pays as country_id, t.civility, t.poste, t.phone as phone_pro, t.phone_mobile, t.phone_perso, t.fax, t.email, t.skype, t.statut, t.photo,";
     $sql .= " t.civility as civility_id, t.address, t.zip, t.town";
@@ -880,7 +884,9 @@ function show_contacts($conf,$langs,$db,$object,$backtopage='')
     $sql .= " LEFT JOIN ".MAIN_DB_PREFIX."socpeople_extrafields as ef on (t.rowid = ef.fk_object)";
     $sql .= " WHERE t.fk_soc = ".$object->id;
     if ($search_status!='' && $search_status != '-1') $sql .= " AND t.statut = ".$db->escape($search_status);
-    if ($search_name)       $sql .= " AND (t.lastname LIKE '%".$db->escape($search_name)."%' OR t.firstname LIKE '%".$db->escape($search_name)."%')";
+    if ($search_name) $sql .= natural_search(array('t.lastname', 't.firstname'), $search_name);
+    // Add where from extra fields
+    include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_sql.tpl.php';
     if ($sortfield == "t.name") $sql.=" ORDER BY t.lastname $sortorder, t.firstname $sortorder";
     else $sql.= " ORDER BY $sortfield $sortorder";
 
@@ -1044,7 +1050,7 @@ function show_contacts($conf,$langs,$db,$object,$backtopage='')
             // Edit
             if ($user->rights->societe->contact->creer)
             {
-                print '<a href="'.DOL_URL_ROOT.'/contact/card.php?action=edit&amp;id='.$obj->rowid.'&amp;backtopage='.urlencode($backtopage).'">';
+                print '<a href="'.DOL_URL_ROOT.'/contact/card.php?action=edit&id='.$obj->rowid.'&backtopage='.urlencode($backtopage).'">';
                 print img_edit();
                 print '</a>';
             }
@@ -1462,7 +1468,7 @@ function show_actions_done($conf, $langs, $db, $filterobj, $objcon='', $noprint=
 		$out.=getTitleFieldOfList($langs->trans("Label"), 0, $_SERVER["PHP_SELF"], '', '', $param, '', $sortfield, $sortorder);
         $out.=getTitleFieldOfList($langs->trans("Date"), 0, $_SERVER["PHP_SELF"], 'a.datep,a.id', '', $param, 'align="center"', $sortfield, $sortorder);
 		$out.=getTitleFieldOfList('');
-		$out.=getTitleFieldOfList('');
+		$out.=getTitleFieldOfList($langs->trans("ActionOnContact"), 0, $_SERVER["PHP_SELF"], 'a.fk_contact', '', $param, '', $sortfield, $sortorder);
 		$out.=getTitleFieldOfList($langs->trans("Status"), 0, $_SERVER["PHP_SELF"], 'a.percent', '', $param, 'align="center"', $sortfield, $sortorder);
 		$out.=getTitleFieldOfList('', 0, $_SERVER["PHP_SELF"], '', '', $param, '', $sortfield, $sortorder, 'maxwidthsearch ');
 		$out.='</tr>';
@@ -1603,7 +1609,7 @@ function show_actions_done($conf, $langs, $db, $filterobj, $objcon='', $noprint=
             $out.='</td>';
 
             // Contact pour cette action
-            if (! empty($objcon->id) && isset($histo[$key]['contact_id']) && $histo[$key]['contact_id'] > 0)
+            if (empty($objcon->id) && isset($histo[$key]['contact_id']) && $histo[$key]['contact_id'] > 0)
             {
                 $contactstatic->lastname=$histo[$key]['lastname'];
                 $contactstatic->firstname=$histo[$key]['firstname'];
