@@ -1402,6 +1402,11 @@ class FactureFournisseur extends CommonInvoice
         if (empty($txlocaltax1)) $txlocaltax1=0;
         if (empty($txlocaltax2)) $txlocaltax2=0;
 
+        if ($rang < 0) {
+            $rangmax = $this->line_max();
+            $rang = $rangmax + 1;
+        }
+        
         $localtaxes_type=getLocalTaxesFromRate($txtva, 0, $mysoc, $this->thirdparty);
 
         // Clean vat code
@@ -1435,6 +1440,12 @@ class FactureFournisseur extends CommonInvoice
 
         // Check parameters
         if ($type < 0) return -1;
+
+        if ($rang < 0)
+        {
+        	$rangmax = $this->line_max();
+        	$rang = $rangmax + 1;
+        }
 
         // Insert line
         $this->line=new SupplierInvoiceLine($this->db);

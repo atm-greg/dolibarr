@@ -520,7 +520,7 @@ class FormFile
 					$modellist=ModelePDFCards::liste_modeles($this->db);
 				}
 			}
-			elseif ($modulepart == 'agenda')
+			elseif ($modulepart == 'agenda' || $modulepart == 'actions')
 			{
 				if (is_array($genallowed)) $modellist=$genallowed;
 				else
@@ -560,7 +560,7 @@ class FormFile
 					$modellist=ModelePDFUserGroup::liste_modeles($this->db);
 				}
 			}
-			else //if ($modulepart != 'agenda')
+			else
 			{
 				// For normalized standard modules
 				$file=dol_buildpath('/core/modules/'.$modulepart.'/modules_'.$modulepart.'.php',0);
@@ -841,9 +841,10 @@ class FormFile
 		$out='';
 		$this->infofiles=array('nboffiles'=>0,'extensions'=>array(),'files'=>array());
 
+		// Get list of files starting with name of ref (but not followed by "-" to discard uploaded files and get only generated files)
+		// @TODO Why not showing all files by just removing the '[^\-]+' at end of regex ?
 		$filterforfilesearch = preg_quote(basename($modulesubdir),'/').'[^\-]+';
-
-		$file_list=dol_dir_list($filedir, 'files', 0, $filterforfilesearch, '\.meta$|\.png$');	// Get list of files starting with name of ref (but not followed by "-" to discard uploaded files)
+		$file_list=dol_dir_list($filedir, 'files', 0, $filterforfilesearch, '\.meta$|\.png$');	// We also discard .meta and .png preview
 
 		//var_dump($file_list);
 		// For ajax treatment

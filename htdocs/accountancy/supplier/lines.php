@@ -111,27 +111,36 @@ if (GETPOST('button_removefilter_x','alpha') || GETPOST('button_removefilter.x',
 if (is_array($changeaccount) && count($changeaccount) > 0) {
 	$error = 0;
 
-	$db->begin();
-
-	$sql1 = "UPDATE " . MAIN_DB_PREFIX . "facture_fourn_det as l";
-	$sql1 .= " SET l.fk_code_ventilation=" . GETPOST('account_parent','int');
-	$sql1 .= ' WHERE l.rowid IN (' . implode(',', $changeaccount) . ')';
-
-	dol_syslog('accountancy/supplier/lines.php::changeaccount sql= ' . $sql1);
-	$resql1 = $db->query($sql1);
-	if (! $resql1) {
-		$error ++;
-		setEventMessages($db->lasterror(), null, 'errors');
-	}
-	if (! $error) {
-		$db->commit();
-		setEventMessages($langs->trans('Save'), null, 'mesgs');
-	} else {
-		$db->rollback();
-		setEventMessages($db->lasterror(), null, 'errors');
+	if (! (GETPOST('account_parent','int') >= 0))
+	{
+		$error++;
+		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Account")), null, 'errors');
 	}
 
-	$account_parent = '';   // Protection to avoid to mass apply it a second time
+	if (! $error)
+	{
+		$db->begin();
+
+		$sql1 = "UPDATE " . MAIN_DB_PREFIX . "facture_fourn_det as l";
+		$sql1 .= " SET l.fk_code_ventilation=" . (GETPOST('account_parent','int') > 0 ? GETPOST('account_parent','int') : '0');
+		$sql1 .= ' WHERE l.rowid IN (' . implode(',', $changeaccount) . ')';
+
+		dol_syslog('accountancy/supplier/lines.php::changeaccount sql= ' . $sql1);
+		$resql1 = $db->query($sql1);
+		if (! $resql1) {
+			$error ++;
+			setEventMessages($db->lasterror(), null, 'errors');
+		}
+		if (! $error) {
+			$db->commit();
+			setEventMessages($langs->trans('Save'), null, 'mesgs');
+		} else {
+			$db->rollback();
+			setEventMessages($db->lasterror(), null, 'errors');
+		}
+
+		$account_parent = '';   // Protection to avoid to mass apply it a second time
+	}
 }
 
 
@@ -165,17 +174,16 @@ print '<script type="text/javascript">
  * Supplier Invoice lines
  */
 $sql = "SELECT f.rowid as facid, f.ref as facnumber, f.ref_supplier, f.libelle as invoice_label, f.datef, f.fk_soc,";
-$sql.= " l.rowid, l.fk_product, l.description, l.total_ht , l.qty, l.tva_tx, l.vat_src_code,";
+$sql.= " l.rowid, l.fk_product, l.product_type as line_type, l.description, l.total_ht , l.qty, l.tva_tx, l.vat_src_code,";
 $sql.= " aa.label, aa.account_number, ";
-$sql.= " p.rowid as product_id, p.ref as product_ref, p.label as product_label, p.fk_product_type as type, co.label as country, s.tva_intra";
+$sql.= " p.rowid as product_id, p.fk_product_type as product_type, p.ref as product_ref, p.label as product_label, p.fk_product_type as type, co.label as country, s.tva_intra";
 $sql .= " FROM " . MAIN_DB_PREFIX . "facture_fourn_det as l";
 $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product as p ON p.rowid = l.fk_product";
-$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "accounting_account as aa ON aa.rowid = l.fk_code_ventilation";
+$sql .= " INNER JOIN " . MAIN_DB_PREFIX . "accounting_account as aa ON aa.rowid = l.fk_code_ventilation";
 $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "facture_fourn as f ON f.rowid = l.fk_facture_fourn";
 $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "societe as s ON s.rowid = f.fk_soc";
 $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "c_country as co ON co.rowid = s.fk_pays ";
 $sql.= " WHERE f.rowid = l.fk_facture_fourn and f.fk_statut >= 1 AND l.fk_code_ventilation <> 0 ";
-$sql.= " AND aa.rowid = l.fk_code_ventilation";
 if ($search_lineid) {
     $sql .= natural_search("l.rowid", $search_lineid, 1);
 }
@@ -269,7 +277,7 @@ if ($result) {
 	print $langs->trans("DescVentilDoneSupplier") . '<br>';
 
 	print '<br><div class="inline-block divButAction">' . $langs->trans("ChangeAccount") . '<br>';
-	print $formaccounting->select_account($account_parent, 'account_parent', 1);
+	print $formaccounting->select_account($account_parent, 'account_parent', 2, array(), 0, 0, 'maxwidth300 maxwidthonsmartphone valignmiddle');
 	print '<input type="submit" class="button valignmiddle" value="' . $langs->trans("ChangeBinding") . '" /></div>';
 
 	$moreforfilter = '';
@@ -330,8 +338,8 @@ if ($result) {
 
 		$product_static->ref = $objp->product_ref;
 		$product_static->id = $objp->product_id;
-		$product_static->type = $objp->type;
 		$product_static->label = $objp->product_label;
+		$product_static->type = $objp->line_type;
 
 		print '<tr class="oddeven">';
 
