@@ -19,6 +19,7 @@ addons:
     sources:
     # To use the last version of pgloader, we add repo of postgresql
     - postgresql
+    - sourceline: 'deb http://http.us.debian.org/debian  main non-free'
     - sourceline: 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main'
     - key_url: 'https://www.postgresql.org/media/keys/ACCC4CF8.asc'  
     packages:
