@@ -51,7 +51,7 @@ class InstallTest extends PHPUnit_Framework_TestCase
 		self::dropTestDatabase();
 
 		// Run the tests in the same window
-		self::shareSession(true);
+// 		self::shareSession(true);
 	}
 
 	protected static function dropTestDatabase()
