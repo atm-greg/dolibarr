@@ -21,7 +21,7 @@
 /**
  * Class InstallTest
  */
-class InstallTest extends PHPUnit_Extensions_Selenium2TestCase
+class InstallTest extends PHPUnit_Framework_TestCase
 {
 	protected static $url = 'https://dev.dolibarr.org';
 	protected static $db_name = 'dolibarr_test';
