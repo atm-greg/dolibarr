@@ -74,7 +74,7 @@ class InstallTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		// Populating the database can take quite long.
-		$this->setSeleniumServerRequestsTimeout(120000);
+// 		$this->setSeleniumServerRequestsTimeout(120000);
 		$this->setBrowserUrl(self::$url);
 	}
 
