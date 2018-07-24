@@ -56,7 +56,7 @@ class InstallTest extends PHPUnit_Extensions_Selenium2TestCase
 
 	protected static function dropTestDatabase()
 	{
-		$mysqli = new mysqli(self::$db_host, self::$db_admin_user, self::$db_admin_pass);
+		$mysqli = new pgsql(self::$db_host, self::$db_admin_user, self::$db_admin_pass);
 		$mysqli->query("DROP DATABASE " . self::$db_name);
 	}
 
