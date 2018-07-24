@@ -208,4 +208,10 @@ class InstallTest extends PHPUnit_Framework_TestCase
 		$this->byId('login')->submit();
 		$this->assertEquals('mainbody', $this->byTag('body')->attribute('id'));
 	}
+	
+	public function url($str = '')
+	{
+	    if(empty($str)) return $this->url;
+	    else $this->url = $str;
+	}
 }
