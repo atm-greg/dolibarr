@@ -24,12 +24,12 @@
 class InstallTest extends PHPUnit_Framework_TestCase
 {
 	protected static $url = 'https://dev.dolibarr.org';
-	protected static $db_name = 'dolibarr_test';
-	protected static $db_host = 'localhost';
-	protected static $db_admin_user = 'root';
+	protected static $db_name = 'travis';
+	protected static $db_host = '127.0.0.1';
+	protected static $db_admin_user = 'travis';
 	protected static $db_admin_pass = '';
-	protected static $db_user = 'dolibarr';
-	protected static $db_pass = 'dolibarr';
+	protected static $db_user = 'travis';
+	protected static $db_pass = '';
 	protected static $dol_admin_user = 'admin';
 	protected static $dol_admin_pass = 'admin';
 
@@ -56,7 +56,8 @@ class InstallTest extends PHPUnit_Framework_TestCase
 
 	protected static function dropTestDatabase()
 	{
-		$new_db = new pgsql(self::$db_host, self::$db_admin_user, self::$db_admin_pass);
+// 	    $new_db = new mysqli(self::$db_host, self::$db_admin_user, self::$db_admin_pass);
+	    $new_db = new DoliDBPgsql('pgsql', self::$db_host, self::$db_admin_user, self::$db_admin_pass);
 		$new_db->query("DROP DATABASE " . self::$db_name);
 	}
 
