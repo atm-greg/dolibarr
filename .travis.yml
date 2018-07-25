@@ -328,6 +328,7 @@ script:
   php step1.php > $TRAVIS_BUILD_DIR/install.log
   php step2.php?action=set >> $TRAVIS_BUILD_DIR/install.log
   rm $INSTALL_FORCED_FILE
+  cat $TRAVIS_BUILD_DIR/install.log
   echo
   
   - |
