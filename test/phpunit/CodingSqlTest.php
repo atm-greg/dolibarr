@@ -183,12 +183,13 @@ class CodingSqlTest extends PHPUnit_Framework_TestCase
                 if ($dir == DOL_DOCUMENT_ROOT.'/install/mysql/migration')
                 {
                     // Test for migration files only
-
+                    $res = $db->query($filecontent);
+                    print $res . "\n";
                 }
                 elseif ($dir == DOL_DOCUMENT_ROOT.'/install/mysql/data')
                 {
                     // Test for data files only
-
+                    
                 }
                 else
                 {
