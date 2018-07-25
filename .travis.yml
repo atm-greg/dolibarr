@@ -333,7 +333,7 @@ script:
   php step2.php set >> $TRAVIS_BUILD_DIR/install.log
   cd ../..
   rm $INSTALL_FORCED_FILE
-  cat $TRAVIS_BUILD_DIR/install.log
+  #cat $TRAVIS_BUILD_DIR/install.log
   set +e
   echo
   
