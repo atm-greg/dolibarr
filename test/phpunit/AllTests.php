@@ -77,173 +77,173 @@ class AllTests
 
         $suite = new PHPUnit_Framework_TestSuite('PHPUnit Framework');
 
-        require_once dirname(__FILE__).'/functional/InstallTest.php';
-        $suite->addTestSuite('InstallTest');
+//         require_once dirname(__FILE__).'/functional/InstallTest.php';
+//         $suite->addTestSuite('InstallTest');
         
         //require_once dirname(__FILE__).'/CoreTest.php';
         //$suite->addTestSuite('CoreTest');
-//         require_once dirname(__FILE__).'/AdminLibTest.php';
-//         $suite->addTestSuite('AdminLibTest');
-//         require_once dirname(__FILE__).'/CompanyLibTest.php';
-//         $suite->addTestSuite('CompanyLibTest');
-//         require_once dirname(__FILE__).'/DateLibTest.php';
-//         $suite->addTestSuite('DateLibTest');
-//         require_once dirname(__FILE__).'/UtilsTest.php';
-//         $suite->addTestSuite('UtilsTest');
-//         //require_once dirname(__FILE__).'/DateLibTzFranceTest.php';
-//         //$suite->addTestSuite('DateLibTzFranceTest');
-//         require_once dirname(__FILE__).'/MarginsLibTest.php';
-//         $suite->addTestSuite('MarginsLibTest');
-//         require_once dirname(__FILE__).'/FilesLibTest.php';
-//         $suite->addTestSuite('FilesLibTest');
-//         require_once dirname(__FILE__).'/GetUrlLibTest.php';
-//         $suite->addTestSuite('GetUrlLibTest');
-//         require_once dirname(__FILE__).'/JsonLibTest.php';
-//         $suite->addTestSuite('JsonLibTest');
-//         require_once dirname(__FILE__).'/ImagesLibTest.php';
-//         $suite->addTestSuite('ImagesLibTest');
-//         require_once dirname(__FILE__).'/FunctionsLibTest.php';
-//         $suite->addTestSuite('FunctionsLibTest');
-//         require_once dirname(__FILE__).'/Functions2LibTest.php';
-//         $suite->addTestSuite('Functions2LibTest');
-//         require_once dirname(__FILE__).'/XCalLibTest.php';
-//         $suite->addTestSuite('XCalLibTest');
+        require_once dirname(__FILE__).'/AdminLibTest.php';
+        $suite->addTestSuite('AdminLibTest');
+        require_once dirname(__FILE__).'/CompanyLibTest.php';
+        $suite->addTestSuite('CompanyLibTest');
+        require_once dirname(__FILE__).'/DateLibTest.php';
+        $suite->addTestSuite('DateLibTest');
+        require_once dirname(__FILE__).'/UtilsTest.php';
+        $suite->addTestSuite('UtilsTest');
+        //require_once dirname(__FILE__).'/DateLibTzFranceTest.php';
+        //$suite->addTestSuite('DateLibTzFranceTest');
+        require_once dirname(__FILE__).'/MarginsLibTest.php';
+        $suite->addTestSuite('MarginsLibTest');
+        require_once dirname(__FILE__).'/FilesLibTest.php';
+        $suite->addTestSuite('FilesLibTest');
+        require_once dirname(__FILE__).'/GetUrlLibTest.php';
+        $suite->addTestSuite('GetUrlLibTest');
+        require_once dirname(__FILE__).'/JsonLibTest.php';
+        $suite->addTestSuite('JsonLibTest');
+        require_once dirname(__FILE__).'/ImagesLibTest.php';
+        $suite->addTestSuite('ImagesLibTest');
+        require_once dirname(__FILE__).'/FunctionsLibTest.php';
+        $suite->addTestSuite('FunctionsLibTest');
+        require_once dirname(__FILE__).'/Functions2LibTest.php';
+        $suite->addTestSuite('Functions2LibTest');
+        require_once dirname(__FILE__).'/XCalLibTest.php';
+        $suite->addTestSuite('XCalLibTest');
 
-//         // Rules into source files content
-//         require_once dirname(__FILE__).'/LangTest.php';
-//         $suite->addTestSuite('LangTest');
-//         require_once dirname(__FILE__).'/CodingSqlTest.php';
-//         $suite->addTestSuite('CodingSqlTest');
-//         require_once dirname(__FILE__).'/CodingPhpTest.php';
-//         $suite->addTestSuite('CodingPhpTest');
+        // Rules into source files content
+        require_once dirname(__FILE__).'/LangTest.php';
+        $suite->addTestSuite('LangTest');
+        require_once dirname(__FILE__).'/CodingSqlTest.php';
+        $suite->addTestSuite('CodingSqlTest');
+        require_once dirname(__FILE__).'/CodingPhpTest.php';
+        $suite->addTestSuite('CodingPhpTest');
 
-//         require_once dirname(__FILE__).'/SecurityTest.php';
-//         $suite->addTestSuite('SecurityTest');
+        require_once dirname(__FILE__).'/SecurityTest.php';
+        $suite->addTestSuite('SecurityTest');
 
-//         require_once dirname(__FILE__).'/UserTest.php';
-//         $suite->addTestSuite('UserTest');
-//         require_once dirname(__FILE__).'/UserGroupTest.php';
-//         $suite->addTestSuite('UserGroupTest');
+        require_once dirname(__FILE__).'/UserTest.php';
+        $suite->addTestSuite('UserTest');
+        require_once dirname(__FILE__).'/UserGroupTest.php';
+        $suite->addTestSuite('UserGroupTest');
 
-//         require_once dirname(__FILE__).'/NumberingModulesTest.php';
-//         $suite->addTestSuite('NumberingModulesTest');
-//         require_once dirname(__FILE__).'/PgsqlTest.php';
-//         $suite->addTestSuite('PgsqlTest');
-//         require_once dirname(__FILE__).'/PdfDocTest.php';
-//         $suite->addTestSuite('PdfDocTest');
-//         require_once dirname(__FILE__).'/BuildDocTest.php';
-//         $suite->addTestSuite('BuildDocTest');
-//         require_once dirname(__FILE__).'/CMailFileTest.php';
-//         $suite->addTestSuite('CMailFileTest');
+        require_once dirname(__FILE__).'/NumberingModulesTest.php';
+        $suite->addTestSuite('NumberingModulesTest');
+        require_once dirname(__FILE__).'/PgsqlTest.php';
+        $suite->addTestSuite('PgsqlTest');
+        require_once dirname(__FILE__).'/PdfDocTest.php';
+        $suite->addTestSuite('PdfDocTest');
+        require_once dirname(__FILE__).'/BuildDocTest.php';
+        $suite->addTestSuite('BuildDocTest');
+        require_once dirname(__FILE__).'/CMailFileTest.php';
+        $suite->addTestSuite('CMailFileTest');
 
-//         require_once dirname(__FILE__).'/CommonObjectTest.php';
-//         $suite->addTestSuite('CommonObjectTest');
+        require_once dirname(__FILE__).'/CommonObjectTest.php';
+        $suite->addTestSuite('CommonObjectTest');
 
-//         require_once dirname(__FILE__).'/SocieteTest.php';
-//         $suite->addTestSuite('SocieteTest');
-//         require_once dirname(__FILE__).'/ContactTest.php';
-//         $suite->addTestSuite('ContactTest');
-//         require_once dirname(__FILE__).'/AdherentTest.php';
-//         $suite->addTestSuite('AdherentTest');
+        require_once dirname(__FILE__).'/SocieteTest.php';
+        $suite->addTestSuite('SocieteTest');
+        require_once dirname(__FILE__).'/ContactTest.php';
+        $suite->addTestSuite('ContactTest');
+        require_once dirname(__FILE__).'/AdherentTest.php';
+        $suite->addTestSuite('AdherentTest');
 
-//         require_once dirname(__FILE__).'/ProductTest.php';
-//         $suite->addTestSuite('ProductTest');
+        require_once dirname(__FILE__).'/ProductTest.php';
+        $suite->addTestSuite('ProductTest');
 
-//         require_once dirname(__FILE__).'/PricesTest.php';
-//         $suite->addTestSuite('PricesTest');
-//         require_once dirname(__FILE__).'/DiscountTest.php';
-//         $suite->addTestSuite('DiscountTest');
+        require_once dirname(__FILE__).'/PricesTest.php';
+        $suite->addTestSuite('PricesTest');
+        require_once dirname(__FILE__).'/DiscountTest.php';
+        $suite->addTestSuite('DiscountTest');
 
-//         require_once dirname(__FILE__).'/ContratTest.php';
-//         $suite->addTestSuite('ContratTest');
+        require_once dirname(__FILE__).'/ContratTest.php';
+        $suite->addTestSuite('ContratTest');
 
-//         require_once dirname(__FILE__).'/FichinterTest.php';
-//         $suite->addTestSuite('FichinterTest');
+        require_once dirname(__FILE__).'/FichinterTest.php';
+        $suite->addTestSuite('FichinterTest');
 
-//         require_once dirname(__FILE__).'/PropalTest.php';
-//         $suite->addTestSuite('PropalTest');
+        require_once dirname(__FILE__).'/PropalTest.php';
+        $suite->addTestSuite('PropalTest');
 
-//         require_once dirname(__FILE__).'/SupplierProposalTest.php';
-//         $suite->addTestSuite('SupplierProposalTest');
+        require_once dirname(__FILE__).'/SupplierProposalTest.php';
+        $suite->addTestSuite('SupplierProposalTest');
 
-//         require_once dirname(__FILE__).'/CommandeTest.php';
-//         $suite->addTestSuite('CommandeTest');
+        require_once dirname(__FILE__).'/CommandeTest.php';
+        $suite->addTestSuite('CommandeTest');
 
-//         require_once dirname(__FILE__).'/CommandeFournisseurTest.php';
-//         $suite->addTestSuite('CommandeFournisseurTest');
+        require_once dirname(__FILE__).'/CommandeFournisseurTest.php';
+        $suite->addTestSuite('CommandeFournisseurTest');
 
-//         require_once dirname(__FILE__).'/FactureTest.php';
-//         $suite->addTestSuite('FactureTest');
-//         require_once dirname(__FILE__).'/FactureRecTest.php';
-//         $suite->addTestSuite('FactureRecTest');
-//         require_once dirname(__FILE__).'/FactureTestRounding.php';
-//         $suite->addTestSuite('FactureTestRounding');
-//         require_once dirname(__FILE__).'/FactureFournisseurTest.php';
-//         $suite->addTestSuite('FactureFournisseurTest');
+        require_once dirname(__FILE__).'/FactureTest.php';
+        $suite->addTestSuite('FactureTest');
+        require_once dirname(__FILE__).'/FactureRecTest.php';
+        $suite->addTestSuite('FactureRecTest');
+        require_once dirname(__FILE__).'/FactureTestRounding.php';
+        $suite->addTestSuite('FactureTestRounding');
+        require_once dirname(__FILE__).'/FactureFournisseurTest.php';
+        $suite->addTestSuite('FactureFournisseurTest');
 
-//         require_once dirname(__FILE__).'/BankAccountTest.php';
-//         $suite->addTestSuite('BankAccountTest');
-//         require_once dirname(__FILE__).'/CompanyBankAccountTest.php';
-//         $suite->addTestSuite('CompanyBankAccountTest');
-//         require_once dirname(__FILE__).'/BonPrelevementTest.php';
-//         $suite->addTestSuite('BonPrelevementTest');
+        require_once dirname(__FILE__).'/BankAccountTest.php';
+        $suite->addTestSuite('BankAccountTest');
+        require_once dirname(__FILE__).'/CompanyBankAccountTest.php';
+        $suite->addTestSuite('CompanyBankAccountTest');
+        require_once dirname(__FILE__).'/BonPrelevementTest.php';
+        $suite->addTestSuite('BonPrelevementTest');
 
-//         require_once dirname(__FILE__).'/ChargeSocialesTest.php';
-//         $suite->addTestSuite('ChargeSocialesTest');
-//         require_once dirname(__FILE__).'/HolidayTest.php';
-//         $suite->addTestSuite('HolidayTest');
-//         require_once dirname(__FILE__).'/ExpenseReportTest.php';
-//         $suite->addTestSuite('ExpenseReportTest');
+        require_once dirname(__FILE__).'/ChargeSocialesTest.php';
+        $suite->addTestSuite('ChargeSocialesTest');
+        require_once dirname(__FILE__).'/HolidayTest.php';
+        $suite->addTestSuite('HolidayTest');
+        require_once dirname(__FILE__).'/ExpenseReportTest.php';
+        $suite->addTestSuite('ExpenseReportTest');
 
-//         require_once dirname(__FILE__).'/EntrepotTest.php';
-//         $suite->addTestSuite('EntrepotTest');
-//         require_once dirname(__FILE__).'/MouvementStockTest.php';
-//         $suite->addTestSuite('MouvementStockTest');
+        require_once dirname(__FILE__).'/EntrepotTest.php';
+        $suite->addTestSuite('EntrepotTest');
+        require_once dirname(__FILE__).'/MouvementStockTest.php';
+        $suite->addTestSuite('MouvementStockTest');
 
-//         require_once dirname(__FILE__).'/CategorieTest.php';
-//         $suite->addTestSuite('CategorieTest');
+        require_once dirname(__FILE__).'/CategorieTest.php';
+        $suite->addTestSuite('CategorieTest');
 
-//         require_once dirname(__FILE__).'/AccountingAccountTest.php';
-//         $suite->addTestSuite('AccountingAccountTest');
+        require_once dirname(__FILE__).'/AccountingAccountTest.php';
+        $suite->addTestSuite('AccountingAccountTest');
 
-//         require_once dirname(__FILE__).'/RestAPIUserTest.php';
-//         $suite->addTestSuite('RestAPIUserTest');
+        require_once dirname(__FILE__).'/RestAPIUserTest.php';
+        $suite->addTestSuite('RestAPIUserTest');
 
-//         // Test only with php7.2 or less
-//         //if ((float) phpversion() < 7.3)
-//         //{
-//         	require_once dirname(__FILE__).'/WebservicesProductsTest.php';
-// 	        $suite->addTestSuite('WebservicesProductsTest');
-// 	        require_once dirname(__FILE__).'/WebservicesInvoicesTest.php';
-// 	        $suite->addTestSuite('WebservicesInvoicesTest');
-// 	        require_once dirname(__FILE__).'/WebservicesOrdersTest.php';
-// 	        $suite->addTestSuite('WebservicesOrdersTest');
-// 	        require_once dirname(__FILE__).'/WebservicesOtherTest.php';
-// 	        $suite->addTestSuite('WebservicesOtherTest');
-// 	        require_once dirname(__FILE__).'/WebservicesThirdpartyTest.php';
-// 	        $suite->addTestSuite('WebservicesThirdpartyTest');
-// 	        require_once dirname(__FILE__).'/WebservicesUserTest.php';
-// 	        $suite->addTestSuite('WebservicesUserTest');
-//         //}
+        // Test only with php7.2 or less
+        //if ((float) phpversion() < 7.3)
+        //{
+        	require_once dirname(__FILE__).'/WebservicesProductsTest.php';
+	        $suite->addTestSuite('WebservicesProductsTest');
+	        require_once dirname(__FILE__).'/WebservicesInvoicesTest.php';
+	        $suite->addTestSuite('WebservicesInvoicesTest');
+	        require_once dirname(__FILE__).'/WebservicesOrdersTest.php';
+	        $suite->addTestSuite('WebservicesOrdersTest');
+	        require_once dirname(__FILE__).'/WebservicesOtherTest.php';
+	        $suite->addTestSuite('WebservicesOtherTest');
+	        require_once dirname(__FILE__).'/WebservicesThirdpartyTest.php';
+	        $suite->addTestSuite('WebservicesThirdpartyTest');
+	        require_once dirname(__FILE__).'/WebservicesUserTest.php';
+	        $suite->addTestSuite('WebservicesUserTest');
+        //}
 
-//         require_once dirname(__FILE__).'/ExportTest.php';
-//         $suite->addTestSuite('ExportTest');
-//         require_once dirname(__FILE__).'/ImportTest.php';
-//         $suite->addTestSuite('ImportTest');
+        require_once dirname(__FILE__).'/ExportTest.php';
+        $suite->addTestSuite('ExportTest');
+        require_once dirname(__FILE__).'/ImportTest.php';
+        $suite->addTestSuite('ImportTest');
 
-//         require_once dirname(__FILE__).'/ScriptsTest.php';
-//         $suite->addTestSuite('ScriptsTest');
+        require_once dirname(__FILE__).'/ScriptsTest.php';
+        $suite->addTestSuite('ScriptsTest');
 
-//         require_once dirname(__FILE__).'/FormAdminTest.php';
-//         $suite->addTestSuite('FormAdminTest');
+        require_once dirname(__FILE__).'/FormAdminTest.php';
+        $suite->addTestSuite('FormAdminTest');
 
-//         require_once dirname(__FILE__).'/ModulesTest.php';  // At end because it's the longer
-//         $suite->addTestSuite('ModulesTest');
+        require_once dirname(__FILE__).'/ModulesTest.php';  // At end because it's the longer
+        $suite->addTestSuite('ModulesTest');
 
 
-//         // GUI
-//         require_once dirname(__FILE__).'/FormAdminTest.php';
-//         $suite->addTestSuite('FormAdminTest');
+        // GUI
+        require_once dirname(__FILE__).'/FormAdminTest.php';
+        $suite->addTestSuite('FormAdminTest');
 
 
         return $suite;
