@@ -325,8 +325,10 @@ script:
   # TODO: SQLite
   cat $INSTALL_FORCED_FILE
   echo "Installation test"
-  php htdocs/install/step1.php > $TRAVIS_BUILD_DIR/install.log
-  php htdocs/install/step2.php?action=set >> $TRAVIS_BUILD_DIR/install.log
+  cd htdocs/install
+  php step1.php > $TRAVIS_BUILD_DIR/install.log
+  php step2.php set >> $TRAVIS_BUILD_DIR/install.log
+  cd ../..
   rm $INSTALL_FORCED_FILE
   cat $TRAVIS_BUILD_DIR/install.log
   echo
