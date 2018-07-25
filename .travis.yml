@@ -327,7 +327,7 @@ script:
   cat $INSTALL_FORCED_FILE
   echo "Installation test"
   cd htdocs/install
-  php step1.php > $TRAVIS_BUILD_DIR/install.log
+  php step1.php $TRAVIS_BUILD_DIR/htdocs > $TRAVIS_BUILD_DIR/install.log
   php step2.php set >> $TRAVIS_BUILD_DIR/install.log
   cd ../..
   rm $INSTALL_FORCED_FILE
