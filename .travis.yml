@@ -322,6 +322,7 @@ script:
   echo '$'force_install_createdatabase=false';' >> $INSTALL_FORCED_FILE
   echo '$'force_install_createuser=false';' >> $INSTALL_FORCED_FILE
   echo '$'force_install_mainforcehttps=false';' >> $INSTALL_FORCED_FILE
+  echo '$'force_install_main_data_root=\'$TRAVIS_BUILD_DIR/htdocs\'';' >> $INSTALL_FORCED_FILE
   # TODO: SQLite
   cat $INSTALL_FORCED_FILE
   echo "Installation test"
