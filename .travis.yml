@@ -289,6 +289,8 @@ script:
 - |
   export INSTALL_FORCED_FILE=htdocs/install/install.forced.php
   echo "Setting up Dolibarr $INSTALL_FORCED_FILE"
+  # Ensure we catch errors
+  set -e
   echo '<?php ' > $INSTALL_FORCED_FILE
   echo '$'force_install_noedit=2';' >> $INSTALL_FORCED_FILE
   if [ "$DB" = 'mysql' ] || [ "$DB" = 'mariadb' ]; then
@@ -316,6 +318,7 @@ script:
   cd ../..
   rm $INSTALL_FORCED_FILE
   cat $TRAVIS_BUILD_DIR/install.log
+  set +e
   echo
   
   - |
