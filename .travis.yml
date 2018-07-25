@@ -197,7 +197,23 @@ before_script:
     echo
   fi
   
-
+- |
+  echo "Setting up database"
+  if [ "$DB" = 'mysql' ] || [ "$DB" = 'mariadb' ] || [ "$DB" = 'postgresql' ]; then
+    echo "MySQL"
+    mysql -e 'DROP DATABASE IF EXISTS travis;'
+    mysql -e 'CREATE DATABASE IF NOT EXISTS travis;'
+    mysql -e 'GRANT ALL PRIVILEGES ON travis.* TO travis@127.0.0.1;'
+    mysql -e 'FLUSH PRIVILEGES;'    
+    #mysql -D travis < dev/initdemo/mysqldump_dolibarr_3.5.0.sql
+  fi
+  if [ "$DB" = 'postgresql' ]; then
+    #pgsql travis < dev/initdemo/mysqldump_dolibarr_3.5.0.sql
+    #pgloader mysql://root:pass@127.0.0.1/base postgresql://dolibarrowner@127.0.0.1/dolibarr
+    pgloader mysql://root@127.0.0.1/travis postgresql:///travis
+  fi
+  # TODO: SQLite
+  echo
 
 - |
   export CONF_FILE=htdocs/conf/conf.php
@@ -305,8 +321,8 @@ script:
   echo '$'force_install_databasepass=\'\'';' >> $INSTALL_FORCED_FILE
   echo '$'force_install_port=\'5432\'';' >> $INSTALL_FORCED_FILE
   echo '$'force_install_prefix=\'llx_\'';' >> $INSTALL_FORCED_FILE
-  echo '$'force_install_createdatabase=true';' >> $INSTALL_FORCED_FILE
-  echo '$'force_install_createuser=true';' >> $INSTALL_FORCED_FILE
+  echo '$'force_install_createdatabase=false';' >> $INSTALL_FORCED_FILE
+  echo '$'force_install_createuser=false';' >> $INSTALL_FORCED_FILE
   echo '$'force_install_mainforcehttps=false';' >> $INSTALL_FORCED_FILE
   echo '$'force_install_main_data_root=\'$TRAVIS_BUILD_DIR/htdocs\'';' >> $INSTALL_FORCED_FILE
   # TODO: SQLite
