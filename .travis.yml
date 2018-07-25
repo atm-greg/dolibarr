@@ -78,6 +78,13 @@ matrix:
     env: DB=mariadb
   - php: '7.2'
     env: DB=mariadb
+  - php: '5.4'
+    env: DB=postgresql
+  - php: '5.5'
+    env: DB=postgresql
+  - php: '5.6'
+    env: DB=postgresql
+    
   - php: hhvm
     env: DB=postgresql
   - php: nightly
@@ -121,8 +128,8 @@ install:
 
 - |
   echo "Installing Parallel Lint"
-  composer -n require jakub-onderka/php-parallel-lint ^0
-  composer -n require jakub-onderka/php-console-highlighter ^0
+  #composer -n require jakub-onderka/php-parallel-lint ^0
+  #composer -n require jakub-onderka/php-console-highlighter ^0
   echo
 
 - |
@@ -140,7 +147,7 @@ install:
 
 - |
   echo "Installing PHP CodeSniffer"
-  composer -n require squizlabs/php_codesniffer ^2
+  #composer -n require squizlabs/php_codesniffer ^2
   echo
 
 - |
@@ -337,70 +344,6 @@ script:
   set +e
   echo
   
-  - |
-  echo "Setting up database"
-  if [ "$DB" = 'mysql' ] || [ "$DB" = 'mariadb' ] || [ "$DB" = 'postgresql' ]; then
-    echo "MySQL2"
-    mysql -e 'DROP DATABASE IF EXISTS travis;'
-    mysql -e 'CREATE DATABASE IF NOT EXISTS travis;'
-    mysql -e 'GRANT ALL PRIVILEGES ON travis.* TO travis@127.0.0.1;'
-    mysql -e 'FLUSH PRIVILEGES;'    
-    mysql -D travis < dev/initdemo/mysqldump_dolibarr_3.5.0.sql
-  fi
-  if [ "$DB" = 'postgresql' ]; then
-    #pgsql travis < dev/initdemo/mysqldump_dolibarr_3.5.0.sql
-    #pgloader mysql://root:pass@127.0.0.1/base postgresql://dolibarrowner@127.0.0.1/dolibarr
-    pgloader mysql://root@127.0.0.1/travis postgresql:///travis
-  fi
-  # TODO: SQLite
-  echo
-  
-- |
-  echo "Upgrading Dolibarr"
-  # Ensure we catch errors
-  set +e
-  cd htdocs/install
-  php upgrade.php 3.5.0 3.6.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade350360.log
-  php upgrade2.php 3.5.0 3.6.0 > $TRAVIS_BUILD_DIR/upgrade350360-2.log
-  php step5.php 3.5.0 3.6.0 > $TRAVIS_BUILD_DIR/upgrade350360-3.log
-  php upgrade.php 3.6.0 3.7.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade360370.log
-  php upgrade2.php 3.6.0 3.7.0 > $TRAVIS_BUILD_DIR/upgrade360370-2.log
-  php step5.php 3.6.0 3.7.0 > $TRAVIS_BUILD_DIR/upgrade360370-3.log
-  php upgrade.php 3.7.0 3.8.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade370380.log
-  php upgrade2.php 3.7.0 3.8.0 > $TRAVIS_BUILD_DIR/upgrade370380-2.log
-  php step5.php 3.7.0 3.8.0 > $TRAVIS_BUILD_DIR/upgrade370380-3.log
-  php upgrade.php 3.8.0 3.9.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade380390.log
-  php upgrade2.php 3.8.0 3.9.0 > $TRAVIS_BUILD_DIR/upgrade380390-2.log
-  php step5.php 3.8.0 3.9.0 > $TRAVIS_BUILD_DIR/upgrade380390-3.log
-  php upgrade.php 3.9.0 4.0.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade390400.log
-  php upgrade2.php 3.9.0 4.0.0 MAIN_MODULE_API,MAIN_MODULE_SUPPLIERPROPOSAL > $TRAVIS_BUILD_DIR/upgrade390400-2.log
-  php step5.php 3.9.0 4.0.0 > $TRAVIS_BUILD_DIR/upgrade390400-3.log
-  php upgrade.php 4.0.0 5.0.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade400500.log
-  php upgrade2.php 4.0.0 5.0.0 > $TRAVIS_BUILD_DIR/upgrade400500-2.log
-  php step5.php 4.0.0 5.0.0 > $TRAVIS_BUILD_DIR/upgrade400500-3.log
-  php upgrade.php 5.0.0 6.0.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade500600.log
-  php upgrade2.php 5.0.0 6.0.0 > $TRAVIS_BUILD_DIR/upgrade500600-2.log
-  php step5.php 5.0.0 6.0.0 > $TRAVIS_BUILD_DIR/upgrade500600-3.log
-  php upgrade.php 6.0.0 7.0.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade600700.log
-  php upgrade2.php 6.0.0 7.0.0 MAIN_MODULE_WEBSITE,MAIN_MODULE_SUPPLIERPROPOSAL > $TRAVIS_BUILD_DIR/upgrade600700-2.log
-  php step5.php 6.0.0 7.0.0 > $TRAVIS_BUILD_DIR/upgrade600700-3.log
-  cd -
-  set +e
-  echo
-  #cat $TRAVIS_BUILD_DIR/upgrade400500-2.log
-  #cat $TRAVIS_BUILD_DIR/upgrade500600.log
-  #cat $TRAVIS_BUILD_DIR/upgrade500600-2.log
-  #cat $TRAVIS_BUILD_DIR/upgrade500600-3.log
-  #cat /tmp/dolibarr_install.log
-  
-- |
-  echo "Unit testing"
-  phpunit --version
-  # Ensure we catch errors. Set this to +e if you want to go to the end to see dolibarr.log file.
-  set -e
-  phpunit -d memory_limit=-1 -c test/phpunit/phpunittest.xml test/phpunit/AllTests.php
-  set +e
-
 - |
   #echo "Output dolibarr.log"
   #cat documents/dolibarr.log
