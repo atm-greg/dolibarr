@@ -309,8 +309,8 @@ script:
   set +e
   cd htdocs/install
   php upgrade.php 3.5.0 3.6.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade350360.log
-  echo $?
-  if [ $? = 1]; then
+  #echo $?
+  if [ $? = 1] || [ $? = '1']; then
     echo "lol"
     exit 1
   fi
