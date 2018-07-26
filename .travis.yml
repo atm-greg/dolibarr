@@ -309,6 +309,10 @@ script:
   set +e
   cd htdocs/install
   php upgrade.php 3.5.0 3.6.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade350360.log
+  if [ "$?" -ne "0" ]; then
+    echo "Sorry, an error occured"
+    exit 1
+  fi
   php upgrade2.php 3.5.0 3.6.0 > $TRAVIS_BUILD_DIR/upgrade350360-2.log
   php step5.php 3.5.0 3.6.0 > $TRAVIS_BUILD_DIR/upgrade350360-3.log
   php upgrade.php 3.6.0 3.7.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade360370.log
@@ -332,6 +336,10 @@ script:
   php upgrade.php 6.0.0 7.0.0 ignoredbversion > $TRAVIS_BUILD_DIR/upgrade600700.log
   php upgrade2.php 6.0.0 7.0.0 MAIN_MODULE_WEBSITE,MAIN_MODULE_SUPPLIERPROPOSAL > $TRAVIS_BUILD_DIR/upgrade600700-2.log
   php step5.php 6.0.0 7.0.0 > $TRAVIS_BUILD_DIR/upgrade600700-3.log
+  if [ "$?" -ne "0" ]; then
+    echo "Sorry, an error occured"
+    exit 1
+  fi
   echo $?
   cd -
   set +e
