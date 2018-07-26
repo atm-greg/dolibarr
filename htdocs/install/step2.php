@@ -623,7 +623,7 @@ else
 }
 
 $ret=0;
-if (! $ok && isset($argv[1])) $ret=1;
+if (! $ok && isset($argv[1])) $ret=$db->lastqueryerror;
 dol_syslog("Exit ".$ret);
 
 dolibarr_install_syslog("--- step2: end");
