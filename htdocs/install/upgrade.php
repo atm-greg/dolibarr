@@ -420,7 +420,7 @@ if (empty($actiondone))
 
 $ret=0;
 if (! $ok && isset($argv[1])) {
-    exit(1);
+    return 1;
     $ret=1;
 }
 dol_syslog("Exit ".$ret);
