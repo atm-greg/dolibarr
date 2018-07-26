@@ -419,10 +419,7 @@ if (empty($actiondone))
 }
 
 $ret=0;
-if (! $ok && isset($argv[1])) {
-    exit(-1);
-    $ret=1;
-}
+if (! $ok && isset($argv[1])) $ret=1;
 dol_syslog("Exit ".$ret);
 
 dolibarr_install_syslog("--- upgrade: end ".((! $ok && empty($_GET["ignoreerrors"])) || $dirmodule));
