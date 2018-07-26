@@ -141,7 +141,7 @@ class InstallTest extends PHPUnit_Framework_TestCase
         $langs=$this->savlangs;
         $db=$this->savdb;
         
-        $listofsqldir = array(DOL_DOCUMENT_ROOT.'/install/mysql/data', DOL_DOCUMENT_ROOT.'/install/mysql/tables');
+        $listofsqldir = array(DOL_DOCUMENT_ROOT.'/install/mysql/tables', DOL_DOCUMENT_ROOT.'/install/mysql/data');
         
         foreach ($listofsqldir as $dir)
         {
@@ -180,23 +180,21 @@ class InstallTest extends PHPUnit_Framework_TestCase
                     print __METHOD__." Result for checking we don't have 'NUMERIC(' = ".$result."\n";
                     $this->assertTrue($result===false, 'Found NUMERIC( into '.$file.'. Bad.');
                     
-                    if ($dir == DOL_DOCUMENT_ROOT.'/install/mysql/migration')
-                    {
-                        // Test for migration files only
-                        //$res = $db->query($filecontent);
-                        //print (($res) ? "sql execution success" : "sql error") . "\n";
-                    }
-                    elseif ($dir == DOL_DOCUMENT_ROOT.'/install/mysql/data')
+                    if ($dir == DOL_DOCUMENT_ROOT.'/install/mysql/data')
                     {
                         // Test for data files only
-                        
+                        $res = $db->query($filecontent);
+                        print (($res) ? "sql execution success" : "sql error") . "\n";
+                        return $res;
                     }
                     else
                     {
                         if (preg_match('/\.key\.sql$/',$file))
                         {
                             // Test for key files only
-                            
+                            $res = $db->query($filecontent);
+                            print (($res) ? "sql execution success" : "sql error") . "\n";
+                            return $res;
                         }
                         else
                         {
@@ -208,6 +206,11 @@ class InstallTest extends PHPUnit_Framework_TestCase
                             $result=stripos($filecontent,'ENGINE=innodb');
                             print __METHOD__." Result for checking we have the ENGINE=innodb string = ".$result."\n";
                             $this->assertGreaterThan(0, $result, 'The ENGINE=innodb was not found into '.$file.'. Add it or just fix syntax to match case.');
+                            
+                            // Test for key files only
+                            $res = $db->query($filecontent);
+                            print (($res) ? "sql execution success" : "sql error") . "\n";
+                            return $res;
                         }
                     }
             }
