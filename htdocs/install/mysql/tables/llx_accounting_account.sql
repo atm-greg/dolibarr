@@ -19,7 +19,7 @@
 -- Table of 'accounts' for accountancy expert module
 -- ============================================================================
 
-create table llx_accounting_account
+create tables llx_accounting_account
 (
   rowid                     integer AUTO_INCREMENT PRIMARY KEY,
   entity                    integer DEFAULT 1 NOT NULL,
