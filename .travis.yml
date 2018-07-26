@@ -350,7 +350,8 @@ script:
   php step1.php $TRAVIS_BUILD_DIR/htdocs > $TRAVIS_BUILD_DIR/install.log
   php step2.php set >> $TRAVIS_BUILD_DIR/install.log
   if [ "$?" -ne "0" ]; then
-    echo "Sorry, an error occured"
+    echo "Sorry, an error occured during installation"
+    cat $TRAVIS_BUILD_DIR/install.log
     exit 1
   fi
   cd ../..
