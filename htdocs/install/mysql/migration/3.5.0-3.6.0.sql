@@ -21,7 +21,7 @@
 
 
 
-ALTER TABLE llx_expedition MODIFY COLUMN height float;
+ALTER TABLES llx_expedition MODIFY COLUMN height float;
 ALTER TABLE llx_expedition MODIFY COLUMN width float;
 ALTER TABLE llx_expedition MODIFY COLUMN size float;
 ALTER TABLE llx_expedition MODIFY COLUMN weight float;
