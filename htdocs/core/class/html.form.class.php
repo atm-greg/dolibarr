@@ -1118,8 +1118,9 @@ class Form
 			if (count($scrit) > 1) $sql.=")";
 			if (! empty($conf->barcode->enabled))
 			{
-				$sql .= " OR s.barcode LIKE '".$this->db->escape($filterkey)."%'";
+				$sql .= " OR s.barcode LIKE '".$this->db->escape($prefix.$filterkey)."%'";
 			}
+			$sql.= " OR s.code_client LIKE '".$this->db->escape($prefix.$filterkey)."%' OR s.code_fournisseur LIKE '".$this->db->escape($prefix.$filterkey)."%'";
 			$sql.=")";
 		}
 		$sql.=$this->db->order("nom","ASC");
@@ -1560,7 +1561,9 @@ class Form
 
 		if(empty($conf->global->MAIN_FIRSTNAME_NAME_POSITION)){
 			$sql.= " ORDER BY u.firstname ASC";
-		}else{
+		}
+		else
+		{
 			$sql.= " ORDER BY u.lastname ASC";
 		}
 
