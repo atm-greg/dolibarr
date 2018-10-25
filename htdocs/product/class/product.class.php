@@ -3488,7 +3488,7 @@ class Product extends CommonObject
 	 *
 	 *  @return 	int			Nb of father + child
 	 */
-	function hasFatherOrChild()
+	public function hasFatherOrChild()
 	{
 		$nb = 0;
 
@@ -3514,7 +3514,7 @@ class Product extends CommonObject
 	 *
 	 * @return 	int		Number of variants
 	 */
-	function hasVariants()
+	public function hasVariants()
 	{
 		$nb = 0;
 		$sql = "SELECT count(rowid) as nb FROM ".MAIN_DB_PREFIX."product_attribute_combination WHERE fk_product_parent = ".$this->id;
@@ -3529,12 +3529,41 @@ class Product extends CommonObject
 		return $nb;
 	}
 
+
+	/**
+	 * Return if loaded product is a variant
+	 *
+	 * @return int
+	 */
+	public function isVariant()
+	{
+		global $conf;
+		if (!empty($conf->variants->enabled)) {
+			$sql = "SELECT rowid FROM " . MAIN_DB_PREFIX . "product_attribute_combination WHERE fk_product_child = " . $this->id . " AND entity IN (" . getEntity('product') . ")";
+
+			$query = $this->db->query($sql);
+
+			if ($query) {
+				if (!$this->db->num_rows($query)) {
+					return false;
+				}
+				return true;
+			} else {
+				dol_print_error($this->db);
+				return -1;
+			}
+
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 *  Return all parent products for current product (first level only)
 	 *
 	 *  @return 	array 		Array of product
 	 */
-	function getFather()
+	public function getFather()
 	{
 		$sql = "SELECT p.rowid, p.label as label, p.ref as ref, pa.fk_product_pere as id, p.fk_product_type, pa.qty, pa.incdec, p.entity";
 		$sql.= " FROM ".MAIN_DB_PREFIX."product_association as pa,";
@@ -3575,7 +3604,7 @@ class Product extends CommonObject
 	 *  @param		int		$level				Level of recursing call (start to 1)
 	 *  @return     array       				Return array(prodid=>array(0=prodid, 1=>qty, 2=> ...)
 	 */
-	function getChildsArbo($id, $firstlevelonly=0, $level=1)
+	public function getChildsArbo($id, $firstlevelonly=0, $level=1)
 	{
 		global $alreadyfound;
 
@@ -3663,7 +3692,7 @@ class Product extends CommonObject
      *  @param      int     $save_lastsearch_value		-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 *	@return		string								String with URL
 	 */
-	function getNomUrl($withpicto=0, $option='', $maxlength=0, $save_lastsearch_value=-1)
+	public function getNomUrl($withpicto=0, $option='', $maxlength=0, $save_lastsearch_value=-1)
 	{
 		global $conf, $langs, $hookmanager;
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/product.lib.php';
@@ -3819,7 +3848,7 @@ class Product extends CommonObject
 	 *	@param      int	$type       0=Sell, 1=Buy, 2=Batch Number management
 	 *	@return     string      	Label of status
 	 */
-	function getLibStatut($mode=0, $type=0)
+	public function getLibStatut($mode=0, $type=0)
 	{
 		switch ($type)
 		{
