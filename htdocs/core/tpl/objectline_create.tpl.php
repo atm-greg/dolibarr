@@ -262,7 +262,7 @@ else {
 		    if ($senderissupplier != 2)
 		    {
     			$ajaxoptions=array(
-    					'update' => array('qty'=>'qty','remise_percent' => 'discount','idprod' => 'idprod'),	// html id tags that will be edited with which ajax json response key
+    			    'update' => array('qty'=>'qty','remise_percent' => 'discount','idprod' => 'idprod', 'price_ht' => 'price_ht'),	// html id tags that will be edited with which ajax json response key
     					'option_disabled' => 'idthatdoesnotexists',					// html id to disable once select is done
     					'warning' => $langs->trans("NoPriceDefinedForThisSupplier") // translation of an error saved into var 'warning' (for exemple shown we select a disabled option into combo)
     			);
@@ -647,6 +647,21 @@ jQuery(document).ready(function() {
 
 		jQuery('#trlinefordates').show();
 
+		<?php 
+		if (!empty($conf->global->EDIT_PREDEF_PRICEHT))
+		{
+		?>
+		// get the HT price for the product and display it
+		$.post('<?php echo DOL_URL_ROOT; ?>/product/ajax/products.php?action=fetch', { 'id': $(this).val(), 'socid' : <?php print $object->socid; ?> }, function(data) {
+			jQuery("#price_ht").val(data.price_ht);
+		},
+		'json');
+		
+		
+		<?php
+		}
+		?>
+
 		<?php
 		if (! empty($usemargins) && $user->rights->margins->creer)
 		{
@@ -831,7 +846,10 @@ function setforpredef() {
 
 	jQuery("#prod_entry_mode_free").prop('checked',false).change();
 	jQuery("#prod_entry_mode_predef").prop('checked',true).change();
-	jQuery("#price_ht").val('').hide();
+	<?php if (empty($conf->global->EDIT_PREDEF_PRICEHT))
+		{?>
+		jQuery("#price_ht").val('').hide();
+	<?php }?>
 	jQuery("#multicurrency_price_ht").hide();
 	jQuery("#price_ttc").hide();	// May no exists
 	jQuery("#fourn_ref").hide();
